@@ -29,17 +29,17 @@ PAGES           = 1
 PAGE_NO         = 1
 
 class MirrorStatus:
-    STATUS_UPLOADING    = "Uploading"
-    STATUS_DOWNLOADING  = "Downloading"
-    STATUS_CLONING      = "Cloning"
-    STATUS_QUEUEDL      = "Queued Download"
-    STATUS_QUEUEUP      = "Queued Upload"
-    STATUS_PAUSED       = "Paused"
-    STATUS_ARCHIVING    = "Archiving"
-    STATUS_EXTRACTING   = "Extracting"
-    STATUS_SPLITTING    = "Spliting"
+    STATUS_UPLOADING    = "🚀"
+    STATUS_DOWNLOADING  = "🛝"
+    STATUS_CLONING      = "♻️"
+    STATUS_QUEUEDL      = "Queued"
+    STATUS_QUEUEUP      = "Queued"
+    STATUS_PAUSED       = "⏸️Paused"
+    STATUS_ARCHIVING    = "🔐"
+    STATUS_EXTRACTING   = "🔐"
+    STATUS_SPLITTING    = "✂️"
     STATUS_CHECKING     = "CheckingUp"
-    STATUS_SEEDING      = "Seeding"
+    STATUS_SEEDING      = "🐌"
 
 class setInterval:
     def __init__(self, interval, action):
@@ -139,11 +139,9 @@ def get_readable_message():
             msg += f"\n<b>File Name</b> » <i>{escape(f'{download.name()}')}</i>\n\n" if elapsed <= config_dict['AUTO_DELETE_MESSAGE_DURATION'] else ""
         else:
             msg += f"\n<b>File Name</b> » <i>{escape(f'{download.name()}')}</i>\n\n"
-        msg += f"⌑ <b>{download.status()}</b>"
         if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_PAUSED,
                                      MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP]:
-            msg += f" » {download.speed()}"
-            msg += f"\n⌑ {get_progress_bar_string(download.progress())} » {download.progress()}"
+            msg += f"\n⌑ <b>{get_progress_bar_string(download.progress())} | {download.status()} » {download.speed()}</b>"
             msg += f"\n⌑ <code>Done   </code>: {download.processed_bytes()} of {download.size()}"
             msg += f"\n⌑ <code>ETA    </code>: {download.eta()}"
             msg += f"\n⌑ <code>Past   </code>: {get_readable_time(elapsed)}"
