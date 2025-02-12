@@ -115,8 +115,8 @@ def get_progress_bar_string(pct):
         pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
     cFull = int(p // 10)
-    p_str = '█' * cFull
-    p_str += '▒' * (10 - cFull)
+    p_str = '⬢' * cFull
+    p_str += '⬡' * (10 - cFull)
     return f"{p_str}"
 
 
@@ -172,7 +172,7 @@ def get_readable_message():
         else:
             msg += f"\n⌑ <code>Task   </code>: <a href='{download.message.link}'>{download.extra_details['mode']}</a>"
         msg += f"\n⌑ <code>User   </code>: {tag}"
-        msg += f"\n⚠️ /{BotCommands.CancelMirror}_{download.gid()}\n\n"
+        msg += f"\n<b>❌ /{BotCommands.CancelMirror}_{download.gid()}</b>\n\n"
     if len(msg) == 0:
         return None, None
     def convert_speed_to_bytes_per_second(spd):
