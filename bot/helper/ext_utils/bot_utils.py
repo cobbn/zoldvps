@@ -136,12 +136,12 @@ def get_readable_message():
             tag = download.message.from_user.mention if download.message.from_user else "Anonymous"
         elapsed = time() - download.extra_details['startTime']
         if config_dict['DELETE_LINKS'] and int(config_dict['AUTO_DELETE_MESSAGE_DURATION']) > 0:
-            msg += f"\n<b>File Name</b> » <i>{escape(f'{download.name()}')}</i>\n\n" if elapsed <= config_dict['AUTO_DELETE_MESSAGE_DURATION'] else ""
+            msg += f"\n<b>{escape(f'{download.name()}')}</b>\n\n" if elapsed <= config_dict['AUTO_DELETE_MESSAGE_DURATION'] else ""
         else:
-            msg += f"\n<b>File Name</b> » <i>{escape(f'{download.name()}')}</i>\n\n"
+            msg += f"\n<b>{escape(f'{download.name()}')}</b>\n\n"
         if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_PAUSED,
                                      MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP]:
-            msg += f"\n⌑ <b>{get_progress_bar_string(download.progress())} | {download.status()} » {download.speed()}</b>"
+            msg += f"⌑ <b>{get_progress_bar_string(download.progress())} | {download.status()} » {download.speed()}</b>"
             msg += f"\n⌑ <code>Done   </code>: {download.processed_bytes()} of {download.size()}"
             msg += f"\n⌑ <code>ETA    </code>: {download.eta()}"
             msg += f"\n⌑ <code>Past   </code>: {get_readable_time(elapsed)}"
