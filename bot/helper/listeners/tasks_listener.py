@@ -20,8 +20,8 @@ from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.fs_utils import (clean_download, clean_target,
                                            get_base_name, get_path_size,
                                            is_archive, is_archive_split,
-                                           is_first_archive_split, join_files)
-from bot.helper.ext_utils.leech_utils import split_file
+                                           is_first_archive_split, join_files, edit_metadata)
+from bot.helper.ext_utils.leech_utils import split_file, get_document_type
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.mirror_utils.status_utils.extract_status import ExtractStatus
@@ -32,6 +32,7 @@ from bot.helper.mirror_utils.status_utils.split_status import SplitStatus
 from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
 from bot.helper.mirror_utils.status_utils.zip_status import ZipStatus
 from bot.helper.mirror_utils.gdrive_utils.upload import gdUpload
+from bot.helper.mirror_utils.status_utils.metadata_status import MetadataStatus
 from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (auto_delete_message,
@@ -258,6 +259,38 @@ class MirrorLeechListener:
                 LOGGER.info(f"Not any valid archive, uploading file as it is. Path: {dl_path}")
                 self.newDir = ""
                 up_path = dl_path
+
+        if metadata := user_dict.get('metadata') or config_dict['METADATA']:
+            try:
+                meta_path = up_path or dl_path
+                self.newDir = f'{self.dir}10000'
+                await makedirs(self.newDir, exist_ok=True)
+                async with download_dict_lock:
+                    download_dict[self.uid] = MetadataStatus(name, size, gid, self)
+        
+                if await aiopath.isfile(meta_path):
+                    file_type = await get_document_type(meta_path)
+                    if file_type and file_type[0]:  # Check if file_type is not None and has at least one element
+                        base_dir, file_name = ospath.split(meta_path)
+                        outfile = ospath.join(self.newDir, file_name)
+                        if self.suproc == 'cancelled':
+                            return
+                        await edit_metadata(self, base_dir, meta_path, outfile, metadata)
+                
+                elif await aiopath.isdir(meta_path):
+                    for dirpath, _, files in await sync_to_async(walk, meta_path):
+                        if self.suproc == 'cancelled':
+                            return
+                        for file in files:
+                            video_file = ospath.join(dirpath, file)
+                            file_type = await get_document_type(video_file)
+                            if file_type and file_type[0]:  # Check if file_type is not None and has at least one element
+                                outfile = ospath.join(self.newDir, file)
+                                await edit_metadata(self, dirpath, video_file, outfile, metadata)
+            
+            except Exception as e:
+                LOGGER.error(f"Error processing metadata: {str(e)}")
+                self.newDir = ""
 
         if self.compress:
             pswd = self.compress if isinstance(self.compress, str) else ''

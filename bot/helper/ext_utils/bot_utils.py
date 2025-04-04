@@ -40,6 +40,7 @@ class MirrorStatus:
     STATUS_SPLITTING    = "✂️"
     STATUS_CHECKING     = "CheckingUp"
     STATUS_SEEDING      = "🐌"
+    STATUS_METADATA     = "📝"
 
 class setInterval:
     def __init__(self, interval, action):
@@ -140,7 +141,8 @@ def get_readable_message():
         else:
             msg += f"\n<b>{escape(f'{download.name()}')}</b>\n\n"
         if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_PAUSED,
-                                     MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP]:
+                                     MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP,
+                                     MirrorStatus.STATUS_METADATA]:
             msg += f"⌑ <b>{get_progress_bar_string(download.progress())} | {download.status()} » {download.speed()}</b>"
             msg += f"\n⌑ <code>Done   </code>: {download.processed_bytes()} of {download.size()}"
             msg += f"\n⌑ <code>ETA    </code>: {download.eta()}"
